@@ -1,4 +1,4 @@
-"""Module is implementation of none-dominated sorting.
+"""Module is implementation of non-dominated sorting.
 
 Original algorithm described in the paper:
 
@@ -14,7 +14,7 @@ __all__ = ["non_domin_sort"]
 from typing import List, Iterable, Tuple, Callable, Dict, Any
 from collections import defaultdict
 
-import stools as st
+from . import stools as st
 
 
 def _is_seq_has_one_uniq_value(iterable: Iterable[Any]) -> bool:
@@ -298,7 +298,7 @@ def _nd_helper_b(seq_objs_front: dict, comp_indices: List[int], assign_indices: 
 def non_domin_sort(decisions: Iterable[Any], get_objectives: Callable[[Any], Iterable[Any]] = None) -> Dict[int, Tuple[Any]]:
     """A non-dominated sorting.
 
-    If 'get_objectives' is 'None', then it is identity map: 'get_objectives = lambda x : x'.
+    If 'get_objectives' is 'None', then it is identity map: 'get_objectives = lambda x: x'.
 
     --------------------
     Args:
