@@ -8,6 +8,7 @@ class TestNdomsort(unittest.TestCase):
     def setUp(self):
         random.seed(2)
         self.max_fronts = 20
+        
     def test_non_domin_sort_many_fronts(self):
         seq = [(i,) * 4 for i in range(self.max_fronts)]
 
