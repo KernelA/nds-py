@@ -1,5 +1,7 @@
 # Non-dominated sorting
 
+Required Python version is 3.5 or higher.
+
 ## Description of the method
 
 You can read about the method in the next article:
