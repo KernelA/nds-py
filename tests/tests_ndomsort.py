@@ -1,8 +1,9 @@
 import unittest
 import random
 
-import ndomsort as nds
-import stools as st
+import nds.ndomsort as nds
+import nds.stools as st
+
 
 class TestNdomsort(unittest.TestCase):
     def setUp(self):
@@ -22,7 +23,7 @@ class TestNdomsort(unittest.TestCase):
                 self.assertTupleEqual(res_seq, seq[front])
 
     def test_non_domin_sort_one_elem(self):
-        seq = [(2,3,4)]
+        seq = [(2, 3, 4)]
 
         res = nds.non_domin_sort(seq)
 
@@ -34,7 +35,7 @@ class TestNdomsort(unittest.TestCase):
 
     def test_non_domin_sort_one_front(self):
 
-        seq = ((1,1), (1,1), (1,1))
+        seq = ((1, 1), (1, 1), (1, 1))
 
         res = nds.non_domin_sort(seq)
 
@@ -46,7 +47,7 @@ class TestNdomsort(unittest.TestCase):
             self.assertTupleEqual(res_seq, seq[0])
 
     def test_non_domin_sort_two_front(self):
-        seq = ((1,0,1), (0,1,1), (-2, -3, 0))
+        seq = ((1, 0, 1), (0, 1, 1), (-2, -3, 0))
 
         res = nds.non_domin_sort(seq)
 
@@ -56,6 +57,20 @@ class TestNdomsort(unittest.TestCase):
 
         for res_seq in res[1]:
             self.assertIn(res_seq, seq[:2])
+
+    def tests_non_domin_sort_indices_param(self):
+        seq = [[i] * 4 for i in range(6)]
+
+        fronts = nds.non_domin_sort(seq, only_front_indices=True)
+
+        self.assertSequenceEqual(fronts, list(range(len(seq))))
+
+    def test_non_domin_sort_indices_param2(self):
+        seq = [[0, 0, 0], [1, 1, 1], [0, 0, 0]]
+
+        fronts = nds.non_domin_sort(seq, only_front_indices=True)
+
+        self.assertSequenceEqual(fronts, [0, 1, 0])
 
     def test_non_domin_sort_random_elem(self):
 
@@ -93,7 +108,6 @@ class TestNdomsort(unittest.TestCase):
                             self.assertFalse(st.is_dominate(seq_curr_front2, seq_curr_front) or st.is_dominate(seq_curr_front, seq_curr_front2))
                     for seq_next_front in fronts[front_index + 1]:
                         self.assertFalse(st.is_dominate(seq_next_front, seq_curr_front))
-                    
 
 
 if __name__ == "__main__":
