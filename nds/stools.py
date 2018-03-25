@@ -8,7 +8,6 @@ from typing import Sequence, Iterable, Optional, Any
 import random
 
 
-
 def is_dominate(leftv: Sequence[Any], rightv: Sequence[Any]) -> bool:
     """Check. Does a 'leftv' dominate a 'rightv'?
 
@@ -38,6 +37,7 @@ def is_dominate(leftv: Sequence[Any], rightv: Sequence[Any]) -> bool:
             is_all_values_less_or_eq = False
             break
     return is_all_values_less_or_eq and is_one_value_less
+
 
 def find_low_median(iterable: Iterable[Any]) -> Optional[Any]:
     """Find median of sequence, if length of sequence is odd,

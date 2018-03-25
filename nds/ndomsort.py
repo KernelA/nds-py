@@ -11,7 +11,7 @@ A Provably Asymptotically Fast Version of the Generalized Jensen Algorithm for N
 
 __all__ = ["non_domin_sort"]
 
-from typing import List, Iterable, Tuple, Callable, Dict, Any
+from typing import List, Iterable, Tuple, Callable, Dict, Any, Union
 from collections import defaultdict
 
 from . import stools as st
@@ -55,6 +55,7 @@ def _is_seq_has_one_uniq_value(iterable: Iterable[Any]) -> bool:
 
     return is_has_uniq_value
 
+
 def _merge(indices1: List[int], indices2: List[int]) -> List[int]:
     """Merge the two list of the indices. Each list must be sorted.
 
@@ -94,7 +95,9 @@ def _merge(indices1: List[int], indices2: List[int]) -> List[int]:
 
     return merged_list
 
-def _split_by(seq_objs_front: dict, indices: List[int], split_value: Any, index_value: int) -> Tuple[List[int], List[int], List[int]]:
+
+def _split_by(seq_objs_front: List[Dict[str, Union[int, Any]]], indices: List[int], split_value: Any, index_value: int) \
+        -> Tuple[List[int], List[int], List[int]]:
     """'indices' splits into three lists.
 
     The three lits are the list of indices, where 'index_value'th value of the objectives is less than a 'split_value',
@@ -127,11 +130,12 @@ def _split_by(seq_objs_front: dict, indices: List[int], split_value: Any, index_
 
     return indices_less_split_value, indices_equal_split_value, indices_greater_split_value
 
-def _sweep_a(seq_objs_front: dict, indices: List[int]) -> None:
+
+def _sweep_a(seq_objs_front: List[Dict[str, Union[Any, str]]], indices: List[int]) -> None:
     """Two-objective sorting.
 
-    It attributes front's index to the lexicographically ordered elements in the  'seq_objs_front', with the indices in the 'indices',
-    based on the first two values of the objectives using a line-sweep algorithm.
+    It attributes front's index to the lexicographically ordered elements in the  'seq_objs_front',
+    with the indices in the 'indices', based on the first two values of the objectives using a line-sweep algorithm.
 
     --------------------
     Args:
@@ -145,9 +149,10 @@ def _sweep_a(seq_objs_front: dict, indices: List[int]) -> None:
     """
     init_ind = set((indices[0],))
 
-    for k  in range(1, len(indices)):
+    for k in range(1, len(indices)):
         i = indices[k]
-        indices_where_sec_values_less_or_eq = [index for index in init_ind if seq_objs_front[index]["objs"][1] <= seq_objs_front[i]["objs"][1]]
+        indices_where_sec_values_less_or_eq = [index for index in init_ind
+                                               if seq_objs_front[index]["objs"][1] <= seq_objs_front[i]["objs"][1]]
         if indices_where_sec_values_less_or_eq:
             max_front = max(seq_objs_front[index]["front"] for index in indices_where_sec_values_less_or_eq)
             seq_objs_front[i]["front"] = max(seq_objs_front[i]["front"], max_front + 1)
@@ -155,11 +160,13 @@ def _sweep_a(seq_objs_front: dict, indices: List[int]) -> None:
         init_ind -= {index for index in init_ind if seq_objs_front[index]["front"] == seq_objs_front[i]["front"]}
         init_ind.add(i)
 
-def _sweep_b(seq_objs_front: dict, comp_indices: List[int], assign_indices: List[int]) -> None:
+
+def _sweep_b(seq_objs_front: List[Dict[str, Union[Any, int]]], comp_indices: List[int], assign_indices: List[int]) -> None:
     """Two-objective sorting procedure.
 
-    It attributes front's indices to elements in the 'seq_objs_front', with the indices in the 'assign_indices', based on the first two values of the objectives
-    by comparing them to fitnesses, with the indices in the  'comp_indices', using a line-sweep algorithm.
+    It attributes front's indices to elements in the 'seq_objs_front', with the indices in the 'assign_indices',
+    based on the first two values of the objectives by comparing them to fitnesses,
+    with the indices in the  'comp_indices', using a line-sweep algorithm.
 
     --------------------
     Args:
@@ -184,25 +191,30 @@ def _sweep_b(seq_objs_front: dict, comp_indices: List[int], assign_indices: List
             i = comp_indices[p]
             fitness_left = seq_objs_front[i]["objs"][:2]
             if fitness_left <= fitness_right:
-                indices_less_value_eq_front = [index for index in init_ind if seq_objs_front[index]["front"] == seq_objs_front[i]["front"]
+                indices_less_value_eq_front = [index for index in init_ind
+                                               if seq_objs_front[index]["front"] == seq_objs_front[i]["front"]
                                                and seq_objs_front[index]["objs"][1] < seq_objs_front[i]["objs"][1]]
 
                 if not indices_less_value_eq_front:
-                    init_ind -= {index for index in init_ind if seq_objs_front[index]["front"] == seq_objs_front[i]["front"]}
+                    init_ind -= {index for index in init_ind
+                                 if seq_objs_front[index]["front"] == seq_objs_front[i]["front"]}
                     init_ind.add(i)
                 p += 1
             else:
                 break
-        indices_less_or_eq_value = [index for index in init_ind if seq_objs_front[index]["objs"][1] <= seq_objs_front[j]["objs"][1]]
+        indices_less_or_eq_value = [index for index in init_ind
+                                    if seq_objs_front[index]["objs"][1] <= seq_objs_front[j]["objs"][1]]
 
         if indices_less_or_eq_value:
             max_front = max(seq_objs_front[index]["front"] for index in indices_less_or_eq_value)
             seq_objs_front[j]["front"] = max(seq_objs_front[j]["front"], max_front + 1)
 
-def _nd_helper_a(seq_objs_front: dict, indices: List[int], count_of_obj: int) -> None:
+
+def _nd_helper_a(seq_objs_front: List[Dict[str, Union[Any, int]]], indices: List[int], count_of_obj: int) -> None:
     """Recursive procedure.
 
-    It attributes front's indices to all elements in the 'seq_objs_front', with the indices in the 'indices', for the first 'count_of_obj' values of the objectives.
+    It attributes front's indices to all elements in the 'seq_objs_front', with the indices in the 'indices',
+    for the first 'count_of_obj' values of the objectives.
 
     --------------------
     Args:
@@ -226,7 +238,7 @@ def _nd_helper_a(seq_objs_front: dict, indices: List[int], count_of_obj: int) ->
             seq_objs_front[index_r]["front"] = max(seq_objs_front[index_r]["front"], seq_objs_front[index_l]["front"] + 1)
     elif count_of_obj == 2:
         _sweep_a(seq_objs_front, indices)
-    elif _is_seq_has_one_uniq_value(seq_objs_front[index]["objs"][count_of_obj - 1]  for index in indices):
+    elif _is_seq_has_one_uniq_value(seq_objs_front[index]["objs"][count_of_obj - 1] for index in indices):
         _nd_helper_a(seq_objs_front, indices, count_of_obj - 1)
     else:
         median = st.find_low_median(seq_objs_front[index]["objs"][count_of_obj - 1] for index in indices)
@@ -241,11 +253,13 @@ def _nd_helper_a(seq_objs_front: dict, indices: List[int], count_of_obj: int) ->
         _nd_helper_b(seq_objs_front, less_and_equal_median, greater_median, count_of_obj - 1)
         _nd_helper_a(seq_objs_front, greater_median, count_of_obj)
 
-def _nd_helper_b(seq_objs_front: dict, comp_indices: List[int], assign_indices: List[int], count_of_obj: int) -> None:
+
+def _nd_helper_b(seq_objs_front: List[Dict[str, Union[Any, int]]], comp_indices: List[int], assign_indices: List[int], count_of_obj: int) -> None:
     """Recursive procedure.
 
-    It attributes a front's indices to all elements in the 'seq_objs_front', with the indices in the  'assign_indices', for the first
-    'count_of_obj' values of the objectives, by comparing them to elements in the 'seq_objs_front', with the indices in the 'comp_indices'.
+    It attributes a front's indices to all elements in the 'seq_objs_front', with the indices in the  'assign_indices',
+    for the first 'count_of_obj' values of the objectives, by comparing them to elements in the 'seq_objs_front',
+    with the indices in the 'comp_indices'.
 
     --------------------
     Args:
@@ -275,17 +289,21 @@ def _nd_helper_b(seq_objs_front: dict, comp_indices: List[int], assign_indices: 
         values_objs_from_comp_indices = {seq_objs_front[i]["objs"][count_of_obj - 1] for i in comp_indices}
         values_objs_from_assign_indices = {seq_objs_front[j]["objs"][count_of_obj - 1] for j in assign_indices}
 
-        min_from_comp_indices, max_from_comp_indices = min(values_objs_from_comp_indices), max(values_objs_from_comp_indices)
+        min_from_comp_indices, max_from_comp_indices = \
+            min(values_objs_from_comp_indices), max(values_objs_from_comp_indices)
 
-        min_from_assign_indices, max_from_assign_indices = min(values_objs_from_assign_indices), max(values_objs_from_assign_indices)
+        min_from_assign_indices, max_from_assign_indices = \
+            min(values_objs_from_assign_indices), max(values_objs_from_assign_indices)
 
         if max_from_comp_indices <= min_from_assign_indices:
             _nd_helper_b(seq_objs_front, comp_indices, assign_indices, count_of_obj - 1)
         elif min_from_comp_indices <= max_from_assign_indices:
             median = st.find_low_median(values_objs_from_comp_indices | values_objs_from_assign_indices)
 
-            less_median_indices_1, equal_median_indices_1, greater_median_indices_1 = _split_by(seq_objs_front, comp_indices, median, count_of_obj - 1)
-            less_median_indices_2, equal_median_indices_2, greater_median_indices_2 = _split_by(seq_objs_front, assign_indices, median, count_of_obj - 1)
+            less_median_indices_1, equal_median_indices_1, greater_median_indices_1 = \
+                _split_by(seq_objs_front, comp_indices, median, count_of_obj - 1)
+            less_median_indices_2, equal_median_indices_2, greater_median_indices_2 = \
+                _split_by(seq_objs_front, assign_indices, median, count_of_obj - 1)
 
             less_end_equal_median_indices_1 = _merge(less_median_indices_1, equal_median_indices_1)
 
@@ -295,7 +313,9 @@ def _nd_helper_b(seq_objs_front: dict, comp_indices: List[int], assign_indices: 
             _nd_helper_b(seq_objs_front, less_end_equal_median_indices_1, greater_median_indices_2, count_of_obj - 1)
             _nd_helper_b(seq_objs_front, greater_median_indices_1, greater_median_indices_2, count_of_obj)
 
-def non_domin_sort(decisions: Iterable[Any], get_objectives: Callable[[Any], Iterable[Any]] = None) -> Dict[int, Tuple[Any]]:
+
+def non_domin_sort(decisions: Iterable[Any], get_objectives: Callable[[Any], Iterable[Any]] = None,
+                   only_front_indices: bool =False) -> Union[Tuple[int], Dict[int, Tuple[Any]]]:
     """A non-dominated sorting.
 
     If 'get_objectives' is 'None', then it is identity map: 'get_objectives = lambda x: x'.
@@ -304,52 +324,70 @@ def non_domin_sort(decisions: Iterable[Any], get_objectives: Callable[[Any], Ite
     Args:
         'decisions': The sequence of the decisions for non-dominated sorting.
         'get_objectives': The function which maps a decision space into a objectives space.
+        'only_front_indices':
 
     --------------------
     Returns:
-        A dictionary. It contains indices of fronts as keys and values are tuple consist of 'decisions' which have a same index of the front.
-
+        If 'only_front_indices' is False:
+            A dictionary. It contains indices of fronts as keys and values are tuple consist of
+            'decisions' which have a same index of the front.
+        Otherwise:
+            Tuple of front's indices for the every decision in 'decisions'.
     """
-
 
     # The dictionary contains the objectives as keys and indices of the their preimages in the 'decisions' as values.
     objs_dict = defaultdict(list)
 
     if get_objectives is None:
-        objs_gen = map(tuple, decisions)
+        objs_gen = map(lambda x: (x, tuple(x)), decisions)
     else:
-        objs_gen = map(lambda x: tuple(get_objectives(x)), decisions)
+        objs_gen = map(lambda x: (x, tuple(get_objectives(x))), decisions)
 
-    for (index, fitness) in enumerate(objs_gen):
-        objs_dict[fitness].append(index)
+    for (index, (decision, fitness)) in enumerate(objs_gen):
+        objs_dict[fitness].append((index, decision))
 
-    total_objs = 0
+    total_unique_objs = 0
 
     for objs in objs_dict:
-        if total_objs == 0:
+        if total_unique_objs == 0:
             first_obj = objs
             count_of_obj = len(objs)
             assert count_of_obj > 1, "The number of the objectives must be > 1, " \
-                "but image of the decision have the length is {0}.\nThe indices of the decisions: {1}.".format(count_of_obj, objs_dict[objs])
+                "but image of the decision have the length is {0}." \
+                                     "\nThe indices of the decisions: {1}.".format(count_of_obj,
+                                                                                   [index for (index, dec)
+                                                                                    in objs_dict[objs]])
         else:
-            assert count_of_obj == len(objs), "The images of the decisions at positions {0} have the number of the objectives is not equal the number of the objectives of the images at positions {1}.".format(objs_dict[first_obj], objs_dict[objs])
-        total_objs += 1
+            assert count_of_obj == len(objs), "The images of the decisions at positions {0} " \
+                                              "have the number of the objectives " \
+                                              "is not equal the number of the objectives of the images at positions " \
+                                              "{1}.".format([index for (index, dec) in objs_dict[first_obj]],
+                                                            [index for (index, dec) in objs_dict[objs]])
+        total_unique_objs += 1
 
-    assert total_objs != 0, "The sequence of the decisions or values of the objectives is empty."
+    assert total_unique_objs != 0, "The sequence of the decisions or values of the objectives is empty."
 
     # The list 'unique_objs' never changes, but its elements yes.
     # It sorted in the lexicographical order.
-    unique_objs = [{"objs" : fitness, "front" : 0}  for fitness in sorted(objs_dict.keys())]
+    unique_objs_and_fronts = [{"objs": fitness, "front": 0} for fitness in sorted(objs_dict.keys())]
 
     # Further, algorithm works only with the indices of list 'unique_objs'.
-    indices_uniq_objs = list(range(len(unique_objs)))
-    _nd_helper_a(unique_objs, indices_uniq_objs, count_of_obj)
+    indices_uniq_objs = list(range(len(unique_objs_and_fronts)))
+    _nd_helper_a(unique_objs_and_fronts, indices_uniq_objs, count_of_obj)
 
-    # The dictionary contains indices of the fronts as keys and the tuple of 'decisions' as values.
-    fronts = defaultdict(tuple)
+    if only_front_indices is True:
+        total_decisions = sum(map(len, (objs_dict[objs] for objs in objs_dict)))
+        fronts = list(range(total_decisions))
+        for objs in unique_objs_and_fronts:
+            for (index, dec) in objs_dict[objs["objs"]]:
+                fronts[index] = objs["front"]
+        fronts = tuple(fronts)
+    else:
+        # The dictionary contains indices of the fronts as keys and the tuple of 'decisions' as values.
+        fronts = defaultdict(tuple)
 
-    # Generate fronts.
-    for objs in unique_objs:
-        fronts[objs["front"]] += tuple(decisions[index] for index in objs_dict[objs["objs"]])
+        # Generate fronts.
+        for objs_front in unique_objs_and_fronts:
+            fronts[objs_front["front"]] += tuple(decision for (index, decision) in objs_dict[objs_front["objs"]])
 
     return fronts
