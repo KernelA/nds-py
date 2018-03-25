@@ -30,6 +30,9 @@ fronts = ndomsort.non_domin_sort(seq)
 # Or we can get values of objectives.
 # fronts = ndomsort.non_domin_sort(seq, lambda x: x[:4])
 
+# 'fronts' is a tuple of front's indices, not a dictionary.
+# fronts = ndomsort.non_domin_sort(seq, only_front_indices=True)
+
 for front in fronts:
     print("\nFront index is {}".format(front))
     for seq in fronts[front]:

@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name="nds",
-      version="0.1.0",
+      version="0.2.0",
       description="Non-dominated sorting algorithm.",
       author= "Alexander Kryuchkov",
       author_email= "KernelA@users.noreply.github.com",
