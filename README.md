@@ -42,5 +42,5 @@ for front in fronts:
 
 ## Other implementations
 
-* [Java](https://github.com/mbuzdalov/non-dominated-sorting)
+* [Java (Jensen-Fortin-Buzdalov divide-and-conquer method)](https://github.com/mbuzdalov/non-dominated-sorting)
 * [C#](https://github.com/KernelA/nds)
