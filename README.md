@@ -1,16 +1,20 @@
 # Non-dominated sorting
 
-Required Python version is 3.5 or higher.
-
 ## Description of the method
 
 You can read about the method in the next article:
 
 Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalized Jensen Algorithm for Non-dominated Sorting  // Parallel Problem Solving from Nature XIII.- 2015. - P. 528-537. - (Lecture Notes on Computer Science; 8672)
 
+## Requirements
+
+1. Python 3.5 or higher.
+2. Installed [setuptools](https://pypi.org/project/setuptools/)
+
 ## Installation
 
-`python setup.py install`
+1. Run `python setup.py install`
+2. Run `python setup.py install_egg_info`
 
 ## How to use
 
