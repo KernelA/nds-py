@@ -154,10 +154,12 @@ def _sweep_a(seq_objs_front: List[Dict[str, Union[Any, str]]], indices: List[int
         indices_where_sec_values_less_or_eq = [index for index in init_ind
                                                if seq_objs_front[index]["objs"][1] <= seq_objs_front[i]["objs"][1]]
         if indices_where_sec_values_less_or_eq:
-            max_front = max(seq_objs_front[index]["front"] for index in indices_where_sec_values_less_or_eq)
+            max_front = max(seq_objs_front[index]["front"]
+                            for index in indices_where_sec_values_less_or_eq)
             seq_objs_front[i]["front"] = max(seq_objs_front[i]["front"], max_front + 1)
 
-        init_ind -= {index for index in init_ind if seq_objs_front[index]["front"] == seq_objs_front[i]["front"]}
+        init_ind -= {index for index in init_ind if seq_objs_front[index]
+                     ["front"] == seq_objs_front[i]["front"]}
         init_ind.add(i)
 
 
@@ -232,18 +234,22 @@ def _nd_helper_a(seq_objs_front: List[Dict[str, Union[Any, int]]], indices: List
         return
     elif len(indices) == 2:
         index_l, index_r = indices[0], indices[1]
-        fitness1, fitness2 = seq_objs_front[index_l]["objs"][:count_of_obj], seq_objs_front[index_r]["objs"][:count_of_obj]
+        fitness1, fitness2 = seq_objs_front[index_l]["objs"][:
+                                                             count_of_obj], seq_objs_front[index_r]["objs"][:count_of_obj]
 
         if st.is_dominate(fitness1, fitness2):
-            seq_objs_front[index_r]["front"] = max(seq_objs_front[index_r]["front"], seq_objs_front[index_l]["front"] + 1)
+            seq_objs_front[index_r]["front"] = max(
+                seq_objs_front[index_r]["front"], seq_objs_front[index_l]["front"] + 1)
     elif count_of_obj == 2:
         _sweep_a(seq_objs_front, indices)
     elif _is_seq_has_one_uniq_value(seq_objs_front[index]["objs"][count_of_obj - 1] for index in indices):
         _nd_helper_a(seq_objs_front, indices, count_of_obj - 1)
     else:
-        median = st.find_low_median(seq_objs_front[index]["objs"][count_of_obj - 1] for index in indices)
+        median = st.find_low_median(
+            seq_objs_front[index]["objs"][count_of_obj - 1] for index in indices)
 
-        less_median, equal_median, greater_median = _split_by(seq_objs_front, indices, median, count_of_obj - 1)
+        less_median, equal_median, greater_median = _split_by(
+            seq_objs_front, indices, median, count_of_obj - 1)
 
         less_and_equal_median = _merge(equal_median, less_median)
 
@@ -282,12 +288,15 @@ def _nd_helper_b(seq_objs_front: List[Dict[str, Union[Any, int]]], comp_indices:
             for j in comp_indices:
                 lv = seq_objs_front[j]["objs"][:count_of_obj]
                 if st.is_dominate(lv, hv) or lv == hv:
-                    seq_objs_front[i]["front"] = max(seq_objs_front[i]["front"], seq_objs_front[j]["front"] + 1)
+                    seq_objs_front[i]["front"] = max(
+                        seq_objs_front[i]["front"], seq_objs_front[j]["front"] + 1)
     elif count_of_obj == 2:
         _sweep_b(seq_objs_front, comp_indices, assign_indices)
     else:
-        values_objs_from_comp_indices = {seq_objs_front[i]["objs"][count_of_obj - 1] for i in comp_indices}
-        values_objs_from_assign_indices = {seq_objs_front[j]["objs"][count_of_obj - 1] for j in assign_indices}
+        values_objs_from_comp_indices = {
+            seq_objs_front[i]["objs"][count_of_obj - 1] for i in comp_indices}
+        values_objs_from_assign_indices = {
+            seq_objs_front[j]["objs"][count_of_obj - 1] for j in assign_indices}
 
         min_from_comp_indices, max_from_comp_indices = \
             min(values_objs_from_comp_indices), max(values_objs_from_comp_indices)
@@ -298,7 +307,8 @@ def _nd_helper_b(seq_objs_front: List[Dict[str, Union[Any, int]]], comp_indices:
         if max_from_comp_indices <= min_from_assign_indices:
             _nd_helper_b(seq_objs_front, comp_indices, assign_indices, count_of_obj - 1)
         elif min_from_comp_indices <= max_from_assign_indices:
-            median = st.find_low_median(values_objs_from_comp_indices | values_objs_from_assign_indices)
+            median = st.find_low_median(values_objs_from_comp_indices |
+                                        values_objs_from_assign_indices)
 
             less_median_indices_1, equal_median_indices_1, greater_median_indices_1 = \
                 _split_by(seq_objs_front, comp_indices, median, count_of_obj - 1)
@@ -308,14 +318,18 @@ def _nd_helper_b(seq_objs_front: List[Dict[str, Union[Any, int]]], comp_indices:
             less_end_equal_median_indices_1 = _merge(less_median_indices_1, equal_median_indices_1)
 
             _nd_helper_b(seq_objs_front, less_median_indices_1, less_median_indices_2, count_of_obj)
-            _nd_helper_b(seq_objs_front, less_median_indices_1, equal_median_indices_2, count_of_obj - 1)
-            _nd_helper_b(seq_objs_front, equal_median_indices_1, equal_median_indices_2, count_of_obj - 1)
-            _nd_helper_b(seq_objs_front, less_end_equal_median_indices_1, greater_median_indices_2, count_of_obj - 1)
-            _nd_helper_b(seq_objs_front, greater_median_indices_1, greater_median_indices_2, count_of_obj)
+            _nd_helper_b(seq_objs_front, less_median_indices_1,
+                         equal_median_indices_2, count_of_obj - 1)
+            _nd_helper_b(seq_objs_front, equal_median_indices_1,
+                         equal_median_indices_2, count_of_obj - 1)
+            _nd_helper_b(seq_objs_front, less_end_equal_median_indices_1,
+                         greater_median_indices_2, count_of_obj - 1)
+            _nd_helper_b(seq_objs_front, greater_median_indices_1,
+                         greater_median_indices_2, count_of_obj)
 
 
 def non_domin_sort(decisions: Iterable[Any], get_objectives: Callable[[Any], Iterable[Any]] = None,
-                   only_front_indices: bool =False) -> Union[Tuple[int], Dict[int, Tuple[Any]]]:
+                   only_front_indices: bool = False) -> Union[Tuple[int], Dict[int, Tuple[Any]]]:
     """A non-dominated sorting.
 
     If 'get_objectives' is 'None', then it is identity map: 'get_objectives = lambda x: x'.
@@ -388,6 +402,7 @@ def non_domin_sort(decisions: Iterable[Any], get_objectives: Callable[[Any], Ite
 
         # Generate fronts.
         for objs_front in unique_objs_and_fronts:
-            fronts[objs_front["front"]] += tuple(decision for (index, decision) in objs_dict[objs_front["objs"]])
+            fronts[objs_front["front"]
+                   ] += tuple(decision for (index, decision) in objs_dict[objs_front["objs"]])
 
     return fronts
