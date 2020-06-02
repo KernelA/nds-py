@@ -13,6 +13,7 @@ __all__ = ["non_domin_sort"]
 
 from typing import List, Iterable, Tuple, Callable, Dict, Any, Union
 from collections import defaultdict
+import statistics
 
 from . import stools as st
 
@@ -245,7 +246,7 @@ def _nd_helper_a(seq_objs_front: List[Dict[str, Union[Any, int]]], indices: List
     elif _is_seq_has_one_uniq_value(seq_objs_front[index]["objs"][count_of_obj - 1] for index in indices):
         _nd_helper_a(seq_objs_front, indices, count_of_obj - 1)
     else:
-        median = st.find_low_median(
+        median = statistics.median_low(
             seq_objs_front[index]["objs"][count_of_obj - 1] for index in indices)
 
         less_median, equal_median, greater_median = _split_by(
@@ -307,8 +308,8 @@ def _nd_helper_b(seq_objs_front: List[Dict[str, Union[Any, int]]], comp_indices:
         if max_from_comp_indices <= min_from_assign_indices:
             _nd_helper_b(seq_objs_front, comp_indices, assign_indices, count_of_obj - 1)
         elif min_from_comp_indices <= max_from_assign_indices:
-            median = st.find_low_median(values_objs_from_comp_indices |
-                                        values_objs_from_assign_indices)
+            median = statistics.median_low(values_objs_from_comp_indices |
+                                           values_objs_from_assign_indices)
 
             less_median_indices_1, equal_median_indices_1, greater_median_indices_1 = \
                 _split_by(seq_objs_front, comp_indices, median, count_of_obj - 1)

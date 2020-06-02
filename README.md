@@ -8,7 +8,7 @@ Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalize
 
 ## Requirements
 
-1. Python 3.5 or higher.
+1. Python 3.6 or higher.
 2. Installed [setuptools](https://pypi.org/project/setuptools/).
 3. Installed [wheel](https://pythonwheels.com/).
 
@@ -17,6 +17,13 @@ Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalize
 1. Run `python setup.py sdist bdist_wheel`.
 2. Find file `nds-*.whl` in the `dist` directory.
 3. Run `pip install nds-*.whl`.
+
+## Tests
+
+Run command:
+```
+python -m unittest discover -v .\tests\
+```
 
 ## How to use
 

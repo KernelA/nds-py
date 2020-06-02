@@ -12,7 +12,7 @@ class TestNdomsort(unittest.TestCase):
         self.max_fronts = 20
         self._min_dim = 2
         self._max_dim = 5
-        
+
     def test_non_domin_sort_many_fronts(self):
         seq = [(i,) * 4 for i in range(self.max_fronts)]
 
@@ -114,8 +114,8 @@ class TestNdomsort(unittest.TestCase):
         for dim in range(self._min_dim, self._max_dim + 1):
             seq = self._generate_seq(dim)
             random.shuffle(seq)
-            front_indices = nds.non_domin_sort(seq, lambda decision: (value ** 2 for value in decision)
-                                               , only_front_indices=True)
+            front_indices = nds.non_domin_sort(seq, lambda decision: (
+                value ** 2 for value in decision), only_front_indices=True)
             self.assertEqual(len(front_indices), len(seq))
             fronts = {}
 
