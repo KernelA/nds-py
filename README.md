@@ -14,7 +14,7 @@ Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalize
 
 ## Installation
 
-1. Run `python setup.py sdist bdist_wheel`.
+1. Run `python setup.py bdist_wheel`.
 2. Find file `nds-*.whl` in the `dist` directory.
 3. Run `pip install nds-*.whl`.
 
