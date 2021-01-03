@@ -1,0 +1,37 @@
+name: Test nds library
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Cache pip dependecies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; 
+            then pip install -r requirements.txt;
+          fi
+      - name: Test with pytest
+        run: |
+          python -m unittest discover -v ./tests/
+      - name: Build wheel
+        run: python setup.py bdist_wheel

@@ -1,0 +1,2 @@
+setuptools~=51.1
+wheel~=0.36
