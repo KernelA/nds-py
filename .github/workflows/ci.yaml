@@ -32,6 +32,6 @@ jobs:
           fi
       - name: Test with pytest
         run: |
-          python -m unittest discover -v ./tests/
+          python -m unittest discover -v ./tests
       - name: Build wheel
         run: python setup.py bdist_wheel

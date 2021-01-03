@@ -22,7 +22,7 @@ Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalize
 
 Run command:
 ```
-python -m unittest discover -v .\tests\
+python -m unittest discover -v ./tests
 ```
 
 ## How to use
