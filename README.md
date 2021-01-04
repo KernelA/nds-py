@@ -1,5 +1,7 @@
 # Non-dominated sorting
 
+![Test nds library](https://github.com/KernelA/nds-py/workflows/Test%20nds%20library/badge.svg?branch=master)
+
 ## Description of the method
 
 You can read about the method in the next article:
