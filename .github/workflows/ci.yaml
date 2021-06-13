@@ -48,13 +48,17 @@ jobs:
 
       - name: Update version
         if: ${{ steps.tag-update.outputs.new_tag != ''}}
+        id: version-update
         run: |
-          echo ${{ steps.tag-update.outputs.new_tag }} > ./version.txt
-          cat ./version.txt
+          VERSION=$(echo ${{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
+          echo $VERSION > ./version.txt
+          echo "::set-output name=version::$VERSION"
 
-      - name: Build wheel
-        run: python setup.py bdist_wheel
+      - run: echo ${{ steps.version-update.outputs.version }}
+      # - name: Build wheel
+      #   run: python setup.py bdist_wheel
       # - uses: EndBug/add-and-commit@v7
       #   with:
       #     default_author: github_action
       #     add: ./version.txt
+      #     tag:
