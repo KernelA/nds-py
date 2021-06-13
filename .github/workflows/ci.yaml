@@ -44,14 +44,21 @@ jobs:
           WITH_V: false
           DRY_RUN: true
           INITIAL_VERSION: 0.3.0
-          DEFAULT_BUMP: none
+          DEFAULT_BUMP: "#none"
 
       - name: Update version
-        if: ${{ steps.tag-update.outputs.new_tag != ''}}
         id: version-update
         run: |
-          VERSION=$(echo ${{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
-          echo $VERSION > ./version.txt
+          VERSION=$({{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
+          if [ -z $VERSION ]
+          then
+            VERSION=$(cat ./version.txt | head -n 1)
+            echo "::set-output name=new_version::false"
+          else
+            VERSION=$(echo ${{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
+            echo $VERSION > ./version.txt
+            echo "::set-output name=new_version::true"
+          fi
           echo "::set-output name=version::$VERSION"
 
       - name: Build wheel
@@ -62,3 +69,18 @@ jobs:
           default_author: github_actions
           add: ./version.txt
           tag: ${{ steps.version-update.outputs.version }}
+
+      - name: Publish package to test PyPi
+        uses: pypa/gh-action-pypi-publish@release/v1
+        if: ${{ github.ref == 'refs/heads/develop' && steps.version-update.outputs.new_version == 'true' }}
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TEST_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      - name: Publish package to PyPi
+        if: ${{ github.ref == 'refs/heads/main' && steps.version-update.outputs.new_version == 'true' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
