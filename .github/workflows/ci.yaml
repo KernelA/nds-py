@@ -9,10 +9,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
       - name: Set up Python 3.6
         uses: actions/setup-python@v2
         with:
@@ -30,8 +32,23 @@ jobs:
           if [ -f requirements.txt ]; 
             then pip install -r requirements.txt;
           fi
-      - name: Test with pytest
+      - name: Test with unittest
         run: |
           python -m unittest discover -v ./tests
+      - name: Bump version and push tag
+        id: tag-update
+        uses: ChloePlanet/github-tag-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          DRY_RUN: true
+          INITIAL_VERSION: 0.3.0
+          DEFAULT_BUMP: none
+
+      - name: Update version
+        run: |
+          echo ${{ steps.tag-update.outputs.new_tag  }} > ./version.txt
+          cat ./version.txt
+
       - name: Build wheel
         run: python setup.py bdist_wheel
