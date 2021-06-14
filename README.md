@@ -18,7 +18,7 @@ Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalize
 
 ### PyPI
 
-[![PyPI version](https://badge.fury.io/py/nds.svg)](https://badge.fury.io/py/nds)
+[![PyPi version](https://badge.fury.io/py/nds.svg)](https://badge.fury.io/py/nds)
 
 ### Local installation 
 
