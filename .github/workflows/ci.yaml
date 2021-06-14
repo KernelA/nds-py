@@ -49,7 +49,7 @@ jobs:
       - name: Update version
         id: version-update
         run: |
-          VERSION=$({{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
+          VERSION=$(echo ${{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
           if [ -z $VERSION ]
           then
             VERSION=$(cat ./version.txt | head -n 1)
@@ -65,6 +65,7 @@ jobs:
         run: python setup.py bdist_wheel
 
       - uses: EndBug/add-and-commit@v7
+        if: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && steps.version-update.outputs.new_version == 'true' }}
         with:
           default_author: github_actions
           add: ./version.txt
@@ -79,7 +80,7 @@ jobs:
           repository_url: https://test.pypi.org/legacy/
 
       - name: Publish package to PyPi
-        if: ${{ github.ref == 'refs/heads/main' && steps.version-update.outputs.new_version == 'true' }}
+        if: ${{ github.ref == 'refs/heads/master' && steps.version-update.outputs.new_version == 'true' }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
