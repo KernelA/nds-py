@@ -1,2 +1,3 @@
 setuptools~=51.1
 wheel~=0.36
+twine~=3.4

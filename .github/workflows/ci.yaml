@@ -9,10 +9,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
       - name: Set up Python 3.6
         uses: actions/setup-python@v2
         with:
@@ -30,8 +32,56 @@ jobs:
           if [ -f requirements.txt ]; 
             then pip install -r requirements.txt;
           fi
-      - name: Test with pytest
+      - name: Test with unittest
         run: |
           python -m unittest discover -v ./tests
+
+      - name: Bump version and push tag
+        id: tag-update
+        uses: anothrNick/github-tag-action@1.26.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          DRY_RUN: true
+          INITIAL_VERSION: 0.3.0
+          DEFAULT_BUMP: "#none"
+
+      - name: Update version
+        id: version-update
+        run: |
+          VERSION=$(echo ${{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
+          if [ -z $VERSION ]
+          then
+            VERSION=$(cat ./version.txt | head -n 1)
+            echo "::set-output name=new_version::false"
+          else
+            VERSION=$(echo ${{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
+            echo $VERSION > ./version.txt
+            echo "::set-output name=new_version::true"
+          fi
+          echo "::set-output name=version::$VERSION"
+
       - name: Build wheel
         run: python setup.py bdist_wheel
+
+      - uses: EndBug/add-and-commit@v7
+        if: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && steps.version-update.outputs.new_version == 'true' }}
+        with:
+          default_author: github_actions
+          add: ./version.txt
+          tag: ${{ steps.version-update.outputs.version }}
+
+      - name: Publish package to test PyPi
+        uses: pypa/gh-action-pypi-publish@release/v1
+        if: ${{ github.ref == 'refs/heads/develop' && steps.version-update.outputs.new_version == 'true' }}
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TEST_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      - name: Publish package to PyPi
+        if: ${{ github.ref == 'refs/heads/master' && steps.version-update.outputs.new_version == 'true' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}

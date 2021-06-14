@@ -1,18 +1,15 @@
 from setuptools import setup
 
+with open("version.txt", encoding="utf-8") as file:
+    version = file.readlines()[0].strip()
+
+if not version:
+    raise ValueError("Found empty version")
+
 setup(name="nds",
-      version="0.3.0",
-      description="Non-dominated sorting algorithm.",
-      author="Alexander Kryuchkov",
-      author_email="KernelA@users.noreply.github.com",
-      url="https://github.com/KernelA/nds-py",
+      version=version,
       license="MIT",
-      long_description="See Buzdalov M., Shalyto A. "
-                       "A Provably Asymptotically Fast Version of the Generalized Jensen Algorithm for Non-dominated Sorting //"
-                       " Parallel Problem Solving from Nature XIII.- 2015. - P. 528-537. - (Lecture Notes on Computer Science ; 8672).",
       packages=["nds"],
-      python_requires=">=3.6",
-      classifiers=[
-          "Development Status :: 4 - Beta"
-      ]
+      keywords=["nds", "multiobjective-optimization", "non-dominated-sorting"],
+      python_requires=">=3.6"
       )

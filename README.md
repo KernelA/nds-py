@@ -16,6 +16,12 @@ Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalize
 
 ## Installation
 
+### PyPI
+
+[![PyPI version](https://badge.fury.io/py/nds.svg)](https://badge.fury.io/py/nds)
+
+### Local installation 
+
 1. Run `python setup.py bdist_wheel`.
 2. Find file `nds-*.whl` in the `dist` directory.
 3. Run `pip install nds-*.whl`.
