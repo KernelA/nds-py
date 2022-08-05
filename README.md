@@ -63,3 +63,8 @@ for front in fronts:
 
 * [Java (Jensen-Fortin-Buzdalov divide-and-conquer method)](https://github.com/mbuzdalov/non-dominated-sorting)
 * [C#](https://github.com/KernelA/nds)
+
+## Example
+
+![Pareto front figure](docs/fronts.svg)
+
