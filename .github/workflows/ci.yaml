@@ -12,21 +12,15 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: "0"
       - name: Set up Python 3.6
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.6
-      - name: Cache pip dependecies
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
+          python-version: '3.6'
+          cache: 'pip'
+          
       - name: Install dependencies
         run: |
           if [ -f requirements.txt ]; 
@@ -38,7 +32,7 @@ jobs:
 
       - name: Bump version and push tag
         id: tag-update
-        uses: anothrNick/github-tag-action@1.26.0
+        uses: anothrNick/github-tag-action@1.55.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: false
@@ -75,7 +69,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         if: ${{ github.ref == 'refs/heads/develop' && steps.version-update.outputs.new_version == 'true' }}
         with:
-          user: __token__
+          user: ${{ secrets.PYPI_USER }}
           password: ${{ secrets.PYPI_TEST_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
 
@@ -83,5 +77,5 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' && steps.version-update.outputs.new_version == 'true' }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          user: __token__
+          user:  ${{ secrets.PYPI_USER }}
           password: ${{ secrets.PYPI_TOKEN }}
