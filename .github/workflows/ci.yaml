@@ -38,7 +38,7 @@ jobs:
           WITH_V: false
           DRY_RUN: true
           INITIAL_VERSION: 0.3.0
-          DEFAULT_BUMP: "#none"
+          DEFAULT_BUMP: "none"
 
       - name: Update version
         id: version-update
