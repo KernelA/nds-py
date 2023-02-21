@@ -32,45 +32,47 @@ jobs:
 
       - name: Bump version and push tag
         id: tag-update
-        uses: anothrNick/github-tag-action@1.55.0
+        uses: anothrNick/github-tag-action@1.61.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: false
           DRY_RUN: true
-          INITIAL_VERSION: 0.3.0
+          INITIAL_VERSION: "0.3.0"
           DEFAULT_BUMP: "none"
+          RELEASE_BRANCHES: "develop"
 
       - name: Update version
         id: version-update
         run: |
-          VERSION=${{ steps.tag-update.outputs.new_tag }}
-          sed -i -r 's/version.*=.*(\digit|.)+/version = ${VERSION}/g' ./setup.cfg
+          sed -i -r 's/version.*=.*(\digit|.)+/version = ${{ steps.tag-update.outputs.new_tag }}/g' ./setup.cfg
           if [ $(git diff --exit-code --name-only ./setup.cfg) ]
           then
             echo "new_version=true" >> $GITHUB_OUTPUT
           fi
 
-      # - name: Build wheel
-      #   run: python setup.py bdist_wheel
+      - name: Build wheel
+        run: python setup.py bdist_wheel
 
       - uses: EndBug/add-and-commit@v9
-        if: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && steps.version-update.outputs.new_version == 'true' }}
+        if: ${{ github.ref == 'refs/heads/develop' && steps.version-update.outputs.new_version == 'true' }}
         with:
           default_author: github_actions
           add: ./setup.cfg
           tag: ${{ steps.tag-update.outputs.new_tag }}
 
       - name: Publish package to test PyPi
-        uses: pypa/gh-action-pypi-publish@release/v1
         if: ${{ github.ref == 'refs/heads/develop' && steps.version-update.outputs.new_version == 'true' }}
-        with:
-          user: ${{ secrets.PYPI_USER }}
-          password: ${{ secrets.PYPI_TEST_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_TEST_TOKEN }}
+          TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
+        run: |
+          twine upload --non-interactive --disable-progress-bar ./dist/*.whl
 
       - name: Publish package to PyPi
         if: ${{ github.ref == 'refs/heads/master' && steps.version-update.outputs.new_version == 'true' }}
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: ${{ secrets.PYPI_USER }}
-          password: ${{ secrets.PYPI_TOKEN }}
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_TEST_TOKEN }}
+        run: |
+          twine upload --non-interactive --disable-progress-bar ./dist/*.whl
