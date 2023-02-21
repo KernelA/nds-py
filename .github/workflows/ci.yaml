@@ -39,7 +39,7 @@ jobs:
           DRY_RUN: true
           INITIAL_VERSION: "0.3.0"
           DEFAULT_BUMP: "none"
-          RELEASE_BRANCHES: "develop"
+          RELEASE_BRANCHES: "master,develop"
 
       - name: Update version
         id: version-update
