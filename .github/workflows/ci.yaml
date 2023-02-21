@@ -18,9 +18,9 @@ jobs:
       - name: Set up Python 3.6
         uses: actions/setup-python@v4
         with:
-          python-version: '3.6'
-          cache: 'pip'
-          
+          python-version: "3.6"
+          cache: "pip"
+
       - name: Install dependencies
         run: |
           if [ -f requirements.txt ]; 
@@ -32,50 +32,47 @@ jobs:
 
       - name: Bump version and push tag
         id: tag-update
-        uses: anothrNick/github-tag-action@1.55.0
+        uses: anothrNick/github-tag-action@1.61.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: false
           DRY_RUN: true
-          INITIAL_VERSION: 0.3.0
+          INITIAL_VERSION: "0.3.0"
           DEFAULT_BUMP: "none"
+          RELEASE_BRANCHES: "master,develop"
 
       - name: Update version
         id: version-update
         run: |
-          VERSION=$(echo ${{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
-          if [ -z $VERSION ]
+          sed -i -r 's/version.*=.*(\digit|.)+/version = ${{ steps.tag-update.outputs.new_tag }}/g' ./setup.cfg
+          if [ $(git diff --exit-code --name-only ./setup.cfg) ]
           then
-            VERSION=$(cat ./version.txt | head -n 1)
-            echo "::set-output name=new_version::false"
-          else
-            VERSION=$(echo ${{ steps.tag-update.outputs.new_tag }} | cut -d'-' -f1)
-            echo $VERSION > ./version.txt
-            echo "::set-output name=new_version::true"
+            echo "new_version=true" >> $GITHUB_OUTPUT
           fi
-          echo "::set-output name=version::$VERSION"
 
       - name: Build wheel
         run: python setup.py bdist_wheel
 
-      - uses: EndBug/add-and-commit@v7
-        if: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && steps.version-update.outputs.new_version == 'true' }}
-        with:
-          default_author: github_actions
-          add: ./version.txt
-          tag: ${{ steps.version-update.outputs.version }}
-
-      - name: Publish package to test PyPi
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: EndBug/add-and-commit@v9
         if: ${{ github.ref == 'refs/heads/develop' && steps.version-update.outputs.new_version == 'true' }}
         with:
-          user: ${{ secrets.PYPI_USER }}
-          password: ${{ secrets.PYPI_TEST_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+          default_author: github_actions
+          add: ./setup.cfg
+          tag: ${{ steps.tag-update.outputs.new_tag }}
+
+      - name: Publish package to test PyPi
+        if: ${{ github.ref == 'refs/heads/develop' && steps.version-update.outputs.new_version == 'true' }}
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_TEST_TOKEN }}
+          TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
+        run: |
+          twine upload --non-interactive --disable-progress-bar ./dist/*.whl
 
       - name: Publish package to PyPi
         if: ${{ github.ref == 'refs/heads/master' && steps.version-update.outputs.new_version == 'true' }}
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user:  ${{ secrets.PYPI_USER }}
-          password: ${{ secrets.PYPI_TOKEN }}
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_TEST_TOKEN }}
+        run: |
+          twine upload --non-interactive --disable-progress-bar ./dist/*.whl
