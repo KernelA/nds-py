@@ -67,7 +67,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_TEST_TOKEN }}
           TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
         run: |
-          twine upload --non-interactive --disable-progress-bar ./dist/*.whl
+          twine upload --skip-existing --non-interactive --disable-progress-bar ./dist/*.whl
 
       - name: Publish package to PyPi
         if: ${{ github.ref == 'refs/heads/master' }}
@@ -75,4 +75,4 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USER }}
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          twine upload --non-interactive --disable-progress-bar ./dist/*.whl
+          twine upload --skip-existing --non-interactive --disable-progress-bar ./dist/*.whl
