@@ -6,7 +6,7 @@
 
 You can read about the method in the next article:
 
-[Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalized Jensen Algorithm for Non-dominated Sorting  // Parallel Problem Solving from Nature XIII.- 2015. - P. 528-537. - (Lecture Notes on Computer Science; 8672)](https://api.semanticscholar.org/CorpusID:9116453)
+[Buzdalov M., Shalyto A. A Provably Asymptotically Fast Version of the Generalized Jensen Algorithm for Non-dominated Sorting  // Parallel Problem Solving from Nature XIII.- 2015. - P. 528-537. - (Lecture Notes on Computer Science; 8672)](https://www.semanticscholar.org/paper/A-Provably-Asymptotically-Fast-Version-of-the-for-Buzdalov-Shalyto/76322e33a6722a80c121a5f515ed3a9897e97eb3)
 
 ## Requirements
 
